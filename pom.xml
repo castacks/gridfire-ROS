@@ -1,53 +1,106 @@
-<!-- [[file:org/GridFire.org::pom.xml][pom.xml]] -->
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>sig-gis</groupId>
   <artifactId>gridfire</artifactId>
-  <version>20200909.105353</version>
+  <packaging>jar</packaging>
+  <version>1.4.0</version>
   <name>gridfire</name>
-  <description>
-    SIG's Raster-based Fire Behavior Model
-  </description>
+  <description>SIG's Raster-based Fire Behavior Model</description>
+  <scm>
+    <url>https://github.com/castacks/gridfire-ROS</url>
+    <connection>scm:git:git://github.com/castacks/gridfire-ROS.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/castacks/gridfire-ROS.git</developerConnection>
+    <tag>44aeaf56fceb01f61b21db6220d2cb562a92570b</tag>
+  </scm>
   <build>
+    <sourceDirectory>.lein-git-deps/triangulum/src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>resources</directory>
+      </testResource>
+    </testResources>
+    <directory>target</directory>
+    <outputDirectory>target/classes</outputDirectory>
     <plugins>
       <plugin>
-        <configuration>
-          <archive>
-            <manifestEntries>
-              <Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
-              <Specification-Version>1.1</Specification-Version>
-              <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
-              <Implementation-Title>com.sun.media.imageio</Implementation-Title>
-              <Implementation-Version>1.1</Implementation-Version>
-              <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
-            </manifestEntries>
-          </archive>
-        </configuration>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/clj</source>
+                <source>src/cljc</source>
+                <source>src</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
-    <sourceDirectory>src</sourceDirectory>
   </build>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo1.maven.org/maven2/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>java.net</id>
+      <url>https://download.java.net/maven/2</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>osgeo.org</id>
+      <url>https://download.osgeo.org/webdav/geotools/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <dependencyManagement>
+    <dependencies/>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
       <version>1.10.1</version>
-    </dependency>
-    <dependency>
-      <groupId>sig-gis</groupId>
-      <artifactId>magellan</artifactId>
-      <version>20200909.105353</version>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.2.16</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clojars.lambdatronic</groupId>
-      <artifactId>matrix-viz</artifactId>
-      <version>0.1.7</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -60,25 +113,84 @@
       <version>0.7.11</version>
     </dependency>
     <dependency>
-      <groupId>net.mikera</groupId>
-      <artifactId>vectorz-clj</artifactId>
-      <version>0.48.0</version>
+      <groupId>org.clojure</groupId>
+      <artifactId>spec.alpha</artifactId>
+      <version>0.2.187</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.specs.alpha</artifactId>
+      <version>0.2.44</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.16</version>
     </dependency>
     <dependency>
       <groupId>net.mikera</groupId>
       <artifactId>core.matrix</artifactId>
       <version>0.62.0</version>
     </dependency>
+    <dependency>
+      <groupId>net.mikera</groupId>
+      <artifactId>vectorz-clj</artifactId>
+      <version>0.48.0</version>
+    </dependency>
+    <dependency>
+      <groupId>sig-gis</groupId>
+      <artifactId>magellan</artifactId>
+      <version>20210401</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>org.eclipse.emf.common</artifactId>
+          <groupId>org.eclipse.emf</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>org.eclipse.emf.ecore</artifactId>
+          <groupId>org.eclipse.emf</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.clojars.lambdatronic</groupId>
+      <artifactId>matrix-viz</artifactId>
+      <version>0.1.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>tools.cli</artifactId>
+      <version>1.0.194</version>
+    </dependency>
+    <dependency>
+      <groupId>kixi</groupId>
+      <artifactId>stats</artifactId>
+      <version>0.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>data.json</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>core.async</artifactId>
+      <version>1.3.610</version>
+    </dependency>
+    <dependency>
+      <groupId>com.taoensso</groupId>
+      <artifactId>tufte</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.nextjournal</groupId>
+      <artifactId>beholder</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>clojars</id>
-      <url>https://repo.clojars.org/</url>
-    </repository>
-    <repository>
-      <id>osgeo</id>
-      <url>https://repo.osgeo.org/repository/release/</url>
-    </repository>
-  </repositories>
 </project>
-<!-- pom.xml ends here -->
+
+<!-- This file was autogenerated by Leiningen.
+  Please do not edit it directly; instead edit project.clj and regenerate it.
+  It should not be considered canonical data. For more information see
+  https://github.com/technomancy/leiningen -->

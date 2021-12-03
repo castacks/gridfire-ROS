@@ -1,6 +1,9 @@
 .cpcache/
 .nrepl-history
 .nrepl-port
+.lein-git-deps/
+.lein-repl-history
+output
 org/GridFire.bbl
 org/GridFire.blg
 org/GridFire.tex
@@ -10,3 +13,5 @@ org/missfont.log
 target/
 server.edn
 scratch.clj
+bin/
+

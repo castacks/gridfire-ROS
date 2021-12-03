@@ -152,9 +152,9 @@
   ([config matrix name envelope simulation-id]
    (output-png config matrix name envelope simulation-id nil))
 
-  ([{:keys [output-directory output-png? outfile-suffix] :as config}
+  ([{:keys [output-directory output-pngs? outfile-suffix] :as config}
     matrix name envelope simulation-id output-time]
-   (when output-png?
+   (when output-pngs?
      (let [file-name (output-filename name
                                       outfile-suffix
                                       (str simulation-id)
@@ -164,7 +164,7 @@
                            matrix
                            (if output-directory
                              (str/join "/" [output-directory file-name])
-                             (file-name)))))))
+                             file-name))))))
 
 (def layer-name->matrix
   [["fire_spread"         :fire-spread-matrix]
@@ -271,7 +271,7 @@
 (defn create-multiplier-lookup
   [{:keys [cell-size weather-layers fuel-moisture-layers]}]
   (let [layers (merge weather-layers fuel-moisture-layers)]
-    (reduce (fn [acc ks] (assoc-in acc ks (cell-size-multiplier cell-size (get-in layers ks))))
+  (reduce (fn [acc ks] (assoc-in acc ks (cell-size-multiplier cell-size (get-in layers ks))))
             {}
             [[:temperature]
              [:relative-humidity]
@@ -281,7 +281,8 @@
              [:dead :10hr]
              [:dead :100hr]
              [:live :herbaceous]
-             [:live :woody]])))
+             [:live :woody]]))
+)
 
 (defn get-weather [config rand-generator weather-type weather-layers]
   (if (contains? weather-layers weather-type)
@@ -294,7 +295,7 @@
   (let [landfire-layers (fetch/landfire-layers config)]
     (assoc config
            :envelope             (get-envelope config landfire-layers)
-           :landfire-matrices    (into {}
+           :landfire-rasters    (into {}
                                        (map (fn [[layer-name layer-info]] [layer-name (first (:matrix layer-info))]))
                                        landfire-layers)
            :ignition-layer       (fetch/ignition-layer config)
@@ -446,9 +447,9 @@
      :summary-stats     summary-stats}))
 
 (defn write-landfire-layers!
-  [{:keys [output-landfire-inputs? outfile-suffix landfire-matrices envelope]}]
+  [{:keys [output-landfire-inputs? outfile-suffix landfire-rasters envelope]}]
   (when output-landfire-inputs?
-    (doseq [[layer matrix] landfire-matrices]
+    (doseq [[layer matrix] landfire-rasters]
       (-> (matrix-to-raster (name layer) matrix envelope)
           (write-raster (str (name layer) outfile-suffix ".tif"))))))
 
