@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>sig-gis</groupId>
   <artifactId>gridfire</artifactId>
@@ -10,7 +11,7 @@
     <url>https://github.com/castacks/gridfire-ROS</url>
     <connection>scm:git:git://github.com/castacks/gridfire-ROS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/castacks/gridfire-ROS.git</developerConnection>
-    <tag>44aeaf56fceb01f61b21db6220d2cb562a92570b</tag>
+    <tag>5569e66da8bdaa3eb9a85c50f426660869aed207</tag>
   </scm>
   <build>
     <sourceDirectory>.lein-git-deps/triangulum/src</sourceDirectory>
@@ -176,6 +177,11 @@
       <groupId>org.clojure</groupId>
       <artifactId>core.async</artifactId>
       <version>1.3.610</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cognitect</groupId>
+      <artifactId>transit-clj</artifactId>
+      <version>1.0.324</version>
     </dependency>
     <dependency>
       <groupId>com.taoensso</groupId>

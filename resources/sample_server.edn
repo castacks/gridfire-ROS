@@ -1,2 +1,2 @@
-{:data-dir     "/gridfire/data"
- :incoming-dir "/gridfire/incoming"}
+{:data-dir     "data"
+ :incoming-dir "incoming"}

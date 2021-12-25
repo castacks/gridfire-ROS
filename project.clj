@@ -15,6 +15,7 @@
     [kixi/stats "0.5.4"]
     [org.clojure/data.json "1.1.0"]
     [org.clojure/core.async "1.3.610"]
+    [com.cognitect/transit-clj "1.0.324"]
     [com.taoensso/tufte "2.2.0"]
     [com.nextjournal/beholder "1.0.0"]]
     :git-dependencies [["https://github.com/sig-gis/triangulum.git" "main"]]
@@ -28,7 +29,7 @@
     "Implementation-Version" "1.1"
     "Implementation-Vendor" "Sun Microsystems, Inc."}
     :min-lein-version "2.5.2"
-    :aot [gridfire.cli]
-    :main gridfire.cli
-    :repl-options {:init-ns gridfire.cli}
+    :aot [gridfire.server]
+    :main gridfire.server
+    :repl-options {:init-ns gridfire.server}
     :global-vars {*warn-on-reflection* true})

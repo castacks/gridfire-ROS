@@ -517,3 +517,39 @@
               (write-csv-outputs! inputs outputs))
             (log-str "Could not run simulation. No valid ignition sites. Config:" config-file)))))))
 ;; command-line-interface ends here
+
+
+;; newly added functions
+(defn memo [f]
+  (let [mem (atom {})]
+    (fn [& args]
+      (if-let [e (find @mem args)]
+        (val e)
+        (let [ret (apply f args)]
+          (swap! mem assoc args ret)
+          ret)))))
+
+(defn load-config 
+  [config-file]
+  (let [config (edn/read-string (slurp config-file))]
+    (if-not (s/valid? ::spec/config config)
+      (s/explain ::spec/config config)
+      (let [inputs (load-inputs config)]
+        (if (seq (:ignitable-sites inputs))
+          inputs
+          (log-str "Invalid config file. No valid ignition sites. Config:" config-file))))))
+
+(def load-config (memo load-config))
+
+(defn propagate-until
+  [max-runtime config-file]
+  (if-let [inputs (load-config config-file)]
+    (let [new_inputs 
+            (assoc inputs 
+              :max-runtime max-runtime
+              :max-runtimes (draw-samples (inputs :rand-gen) (inputs :simulations) max-runtime))
+          outputs (run-simulations! new_inputs)]
+      (write-landfire-layers! inputs)
+      (write-burn-probability-layer! inputs outputs)
+      (write-csv-outputs! inputs outputs))
+    (log-str "Invalid config file. Config:" config-file)))
