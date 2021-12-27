@@ -397,13 +397,14 @@
                                                 input-variations
                                                 {:initial-ignition-site initial-ignition-site})))]
      (when fire-spread-results
+       (prn (keys fire-spread-results))
        (process-output-layers! inputs fire-spread-results envelope i)
        (when-let [timestep output-burn-probability]
          (process-burn-count! fire-spread-results burn-count-matrix timestep))
        (process-binary-output! inputs fire-spread-results i))
      (when output-csvs?
        (merge
-        input-variations
+        (dissoc input-variations :rand-gen)
         {:simulation       (inc i)
          :ignition-row     (ignition-rows i)
          :ignition-col     (ignition-cols i)
@@ -411,9 +412,10 @@
          :exit-condition   (:exit-condition fire-spread-results :no-fire-spread)
          :crown-fire-count (:crown-fire-count fire-spread-results)}
         (if fire-spread-results
-          (tufte/p
+          (merge (tufte/p
            :summarize-fire-spread-results
            (summarize-fire-spread-results fire-spread-results cell-size))
+           fire-spread-results)
           {:fire-size                  0.0
            :flame-length-mean          0.0
            :flame-length-stddev        0.0
@@ -549,7 +551,8 @@
               :max-runtime max-runtime
               :max-runtimes (draw-samples (inputs :rand-gen) (inputs :simulations) max-runtime))
           outputs (run-simulations! new_inputs)]
-      (write-landfire-layers! inputs)
-      (write-burn-probability-layer! inputs outputs)
-      (write-csv-outputs! inputs outputs))
+      (write-landfire-layers! new_inputs)
+      (write-burn-probability-layer! new_inputs outputs)
+      (write-csv-outputs! new_inputs outputs)
+      outputs)
     (log-str "Invalid config file. Config:" config-file)))

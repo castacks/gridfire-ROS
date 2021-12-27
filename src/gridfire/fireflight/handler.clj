@@ -1,5 +1,6 @@
 (ns gridfire.fireflight.handler
-  (:require [clojure.core.async           :refer [>! chan go alts!]]
+  (:require [clojure.core.matrix          :as m]
+            [clojure.core.async           :refer [>! chan go alts!]]
             [clojure.data.json            :as json]
             [clojure.edn                  :as edn]
             [clojure.java.shell           :as sh]
@@ -22,9 +23,37 @@
             [ring.middleware.cors         :refer [wrap-cors]])
   (:import java.util.TimeZone))
 
+
+(defn matrix-to-vectors
+    [{:keys [simulation 
+            spread-rate-matrix 
+            fire-type-matrix 
+            fire-line-intensity-matrix
+            fire-spread-matrix
+            spot-count
+            global-clock 
+            flame-length-matrix 
+            crown-fire-count 
+            burn-time-matrix
+            ] :as inputs}]
+    {
+        :simulation simulation
+        :spot-count spot-count
+        :global-clock global-clock
+        :crown-fire-count crown-fire-count
+        :spread-rate-matrix (m/to-nested-vectors spread-rate-matrix)
+        :fire-type-matrix (m/to-nested-vectors fire-type-matrix)
+        :fire-line-intensity-matrix (m/to-nested-vectors fire-line-intensity-matrix)
+        :fire-spread-matrix (m/to-nested-vectors fire-spread-matrix)
+        :flame-length-matrix (m/to-nested-vectors fire-spread-matrix)
+        :burn-time-matrix (m/to-nested-vectors burn-time-matrix)
+    })
+
 (defn format-response
-    [& args]
-    (response {:test-body 2})
+    [output]
+    (->> (output :summary-stats)
+        (map matrix-to-vectors)
+        (response))
 )
 
 (defn handle-simulation-request
@@ -35,7 +64,7 @@
                     :success "true")
          (catch Exception e
             (response {:msg (ex-message e) :success "false"})))
-        (response {:msg "did not supply field 'runtime'":success "false"})))
+        (response {:msg "did not supply field 'runtime'" :success "false"})))
 
 (defroutes app-routes
     (GET "/simulate" request (handle-simulation-request request)))
