@@ -17,7 +17,7 @@
             [clojure.spec.alpha           :as spec]
             [compojure.core               :refer :all]
             [compojure.route              :as route]
-            [ring.middleware.defaults     :refer [wrap-defaults site-defaults]]
+            [ring.middleware.defaults     :refer [wrap-defaults site-defaults api-defaults]]
             [ring.middleware.json         :refer [wrap-json-body wrap-json-response]]
             [ring.util.response           :refer [response]]
             [ring.middleware.cors         :refer [wrap-cors]])
@@ -53,27 +53,28 @@
     [output]
     (->> (output :summary-stats)
         (map matrix-to-vectors)
-        (response))
-)
+        (response)))
 
 (defn handle-simulation-request
     [request]
     (if-let [runtime (get-in request [:body :runtime])]
         (try
-         (assoc (format-response (cli/propagate-until (Long/valueOf runtime) "resources/sample_geotiff_config.edn"))
+         (assoc (format-response (cli/propagate-until (if (int? runtime) runtime (Long/valueOf runtime)) "resources/sample_geotiff_config.edn"))
                     :success "true")
          (catch Exception e
             (response {:msg (ex-message e) :success "false"})))
         (response {:msg "did not supply field 'runtime'" :success "false"})))
 
 (defroutes app-routes
-    (GET "/simulate" request (handle-simulation-request request)))
+    (GET "/simulate" request (handle-simulation-request request))
+    (POST "/simulate" request (handle-simulation-request request))
+    (route/not-found "Not Found"))
 
 (def app
     (->
         app-routes
         (wrap-cors :access-control-allow-origin [#".*"]
-                   :access-control-allow-methods [:get])
+                   :access-control-allow-methods [:get, :post])
         (wrap-json-body {:keywords? true :bigdecimals? true})
         (wrap-json-response)
-        (wrap-defaults site-defaults)))
+        (wrap-defaults api-defaults)))
