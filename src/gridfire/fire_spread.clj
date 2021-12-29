@@ -466,6 +466,7 @@
         :exit-condition             (if (seq ignited-cells) :max-runtime-reached :no-burnable-fuels)
         :fire-spread-matrix         fire-spread-matrix
         :flame-length-matrix        flame-length-matrix
+        :ignited-cells              ignited-cells
         :fire-line-intensity-matrix fire-line-intensity-matrix
         :burn-time-matrix           burn-time-matrix
         :spread-rate-matrix         spread-rate-matrix

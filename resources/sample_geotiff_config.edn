@@ -58,7 +58,7 @@
     ;; Section 4: Number of simulations and (optional) random seed parameter
     :max-runtime               60             ; (minutes)
     :ellipse-adjustment-factor 1.0            ; (< 1.0 = more circular, > 1.0 = more elliptical)
-    :simulations               10
+    :simulations               1
     :random-seed               1234567890     ; long value (optional)
 
     ;; Section 5: Types and names of outputs
