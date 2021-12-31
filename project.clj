@@ -35,9 +35,9 @@
     "Implementation-Version" "1.1"
     "Implementation-Vendor" "Sun Microsystems, Inc."}
     :min-lein-version "2.5.2"
-    :aot [gridfire.server-fireflight]
-    :main gridfire.server-fireflight
-    :repl-options {:init-ns gridfire.server}
+    :aot [gridfire.cli]
+    :main gridfire.cli
+    :repl-options {:init-ns gridfire.cli}
     :global-vars {*warn-on-reflection* true}
     :ring {:handler gridfire.fireflight.handler/app}
     :profiles
