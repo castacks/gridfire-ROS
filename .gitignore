@@ -3,7 +3,9 @@
 .nrepl-port
 .lein-git-deps/
 .lein-repl-history
-output
+output/*.png
+output/*.tif
+output/*.csv
 org/GridFire.bbl
 org/GridFire.blg
 org/GridFire.tex
