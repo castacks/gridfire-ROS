@@ -16,7 +16,7 @@
                                                   crown-fire-line-intensity
                                                   cruz-crown-fire-spread
                                                   van-wagner-crown-fire-initiation?]]
-            [gridfire.fuel-models         :refer [build-fuel-model moisturize]]
+            [gridfire.fuel-models         :refer [build-fuel-model moisturize calc-heat-density]]
             [gridfire.perturbation        :as perturbation]
             [gridfire.utils.primitive     :refer [double-reduce]]
             [gridfire.spotting            :as spot]
@@ -74,6 +74,7 @@
      ^double spread-rate
      ^double fire-line-intensity
      ^double flame-length
+     ^double heat-density
      fractional-distance
      fire-type
      crown-fire?])
@@ -114,7 +115,8 @@
         fire-line-intensity       (if crown-fire?
                                     (+ surface-intensity crown-intensity)
                                     surface-intensity)
-        flame-length              (byram-flame-length fire-line-intensity)]
+        flame-length              (byram-flame-length fire-line-intensity)
+        heat-density              (calc-heat-density fuel-model)]
     (->BurnTrajectory neighbor
                       here
                       trajectory
@@ -122,6 +124,7 @@
                       spread-rate
                       fire-line-intensity
                       flame-length
+                      heat-density
                       (volatile! (if (= trajectory overflow-trajectory)
                                    overflow-heat
                                    0.0))
@@ -406,6 +409,7 @@
            burn-time-matrix
            spread-rate-matrix
            fire-type-matrix
+           heat-density-matrix
            fractional-distance-matrix] :as matrices}
    ignited-cells]
   (let [max-runtime      (double max-runtime)
@@ -432,7 +436,7 @@
          (doseq [{:keys
                   [cell flame-length fire-line-intensity
                    ignition-probability spread-rate fire-type
-                   dt-adjusted crown-fire?]} ignition-events]
+                   heat-density dt-adjusted crown-fire?]} ignition-events]
            (let [[i j]       cell
                  dt-adjusted (double dt-adjusted)]
              (when crown-fire? (swap! crown-fire-count inc))
@@ -441,7 +445,8 @@
              (m/mset! fire-line-intensity-matrix i j fire-line-intensity)
              (m/mset! burn-time-matrix           i j (+ global-clock dt-adjusted))
              (m/mset! spread-rate-matrix         i j spread-rate)
-             (m/mset! fire-type-matrix           i j (fire-type fire-type-to-value))))
+             (m/mset! fire-type-matrix           i j (fire-type fire-type-to-value))
+             (m/mset! heat-density-matrix        i j heat-density)))
          (let [new-spot-ignitions (new-spot-ignitions (assoc inputs :global-clock global-clock)
                                                       matrices
                                                       ignition-events)
@@ -471,6 +476,7 @@
         :burn-time-matrix           burn-time-matrix
         :spread-rate-matrix         spread-rate-matrix
         :fire-type-matrix           fire-type-matrix
+        :heat-density-matrix        heat-density-matrix
         :crown-fire-count           @crown-fire-count
         :spot-count                 @spot-count}))))
 
@@ -535,6 +541,7 @@
         firebrand-count-matrix     (when spotting (m/zero-matrix num-rows num-cols))
         spread-rate-matrix         (m/zero-matrix num-rows num-cols)
         fire-type-matrix           (m/zero-matrix num-rows num-cols)
+        heat-density-matrix        (m/zero-matrix num-rows num-cols)
         fractional-distance-matrix (when (= trajectory-combination :sum) (m/zero-matrix num-rows num-cols))]
     (when (and (in-bounds? num-rows num-cols initial-ignition-site)
                (burnable-fuel-model? (m/mget fuel-model-matrix i j))
@@ -547,6 +554,7 @@
       (m/mset! burn-time-matrix i j -1.0)
       (m/mset! spread-rate-matrix i j -1.0)
       (m/mset! fire-type-matrix i j -1.0)
+      (m/mset! heat-density-matrix i j -1.0)
       (let [ignited-cells (compute-neighborhood-fire-spread-rates!
                            inputs
                            fire-spread-matrix
@@ -562,6 +570,7 @@
                    :firebrand-count-matrix     firebrand-count-matrix
                    :burn-time-matrix           burn-time-matrix
                    :fire-type-matrix           fire-type-matrix
+                   :heat-density-matrix        heat-density-matrix
                    :fractional-distance-matrix fractional-distance-matrix}
                   ignited-cells)))))
 
@@ -581,6 +590,7 @@
             burn-time-matrix           (initialize-matrix num-rows num-cols non-zero-indices)
             firebrand-count-matrix     (when spotting (m/zero-matrix num-rows num-cols))
             spread-rate-matrix         (initialize-matrix num-rows num-cols non-zero-indices)
+            heat-density-matrix        (initialize-matrix num-rows num-cols non-zero-indices)
             fire-type-matrix           (initialize-matrix num-rows num-cols non-zero-indices)
             fractional-distance-matrix (when (= trajectory-combination :sum) (initialize-matrix num-rows num-cols non-zero-indices))
             ignited-cells              (generate-ignited-cells inputs fire-spread-matrix perimeter-indices)]
@@ -593,6 +603,7 @@
                      :firebrand-count-matrix     firebrand-count-matrix
                      :burn-time-matrix           burn-time-matrix
                      :fire-type-matrix           fire-type-matrix
+                     :heat-density-matrix        heat-density-matrix
                      :fractional-distance-matrix fractional-distance-matrix}
                     ignited-cells))))))
 ;; fire-spread-algorithm ends here

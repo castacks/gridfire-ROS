@@ -373,7 +373,7 @@
   [{:keys [output-csvs? output-burn-probability envelope ignition-layer cell-size
            max-runtimes ignition-rows ignition-cols foliar-moistures ellipse-adjustment-factors perturbations
            temperatures relative-humidities wind-speeds-20ft wind-from-directions
-           random-seed] :as inputs}
+           random-seed num-rows num-cols] :as inputs}
    burn-count-matrix
    i]
   (tufte/profile
@@ -410,7 +410,9 @@
          :ignition-col     (ignition-cols i)
          :foliar-moisture  (foliar-moistures i)
          :exit-condition   (:exit-condition fire-spread-results :no-fire-spread)
-         :crown-fire-count (:crown-fire-count fire-spread-results)}
+         :crown-fire-count (:crown-fire-count fire-spread-results)
+         :num-rows         num-rows
+         :num-cols         num-cols}
         (if fire-spread-results
           (merge (tufte/p
            :summarize-fire-spread-results

@@ -280,3 +280,15 @@
       (add-weighting-factors)
       (add-live-moisture-of-extinction)))
 ;; add-live-moisture-of-extinction ends here
+
+
+;; newly added
+(defn calc-heat-density 
+  [{:keys [w_o h f_ij f_i] :as fuel-model}]
+    (let [
+        h_i (size-class-sum (fn [i j] (* (-> f_ij i ^double (j)) (-> h i ^double (j)))))
+        h'  (category-sum (fn [i] (* (-> f_i ^double (i)) (-> h_i ^double (i)))))
+        w_o_i (size-class-sum (fn [i j] (* (-> f_ij i ^double (j)) (-> w_o i ^double (j)))))
+        w_o' (category-sum (fn [i] (* (-> f_i ^double (i)) (-> w_o_i ^double (i)))))
+      ]
+      (* h' w_o')))

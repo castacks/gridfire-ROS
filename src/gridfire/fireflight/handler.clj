@@ -33,21 +33,27 @@
             spot-count
             global-clock 
             flame-length-matrix 
+            heat-density-matrix
             crown-fire-count 
             burn-time-matrix
             ignited-cells
+            num-rows
+            num-cols
             ] :as inputs}]
     {
         :simulation simulation
         :spot-count spot-count
         :global-clock global-clock
         :crown-fire-count crown-fire-count
-        :ignited-cells (map (fn [ign-info] (get ign-info :cell)) ignited-cells)
+        :num-rows num-rows
+        :num-cols num-cols
+        :newly-ignited-cells (map :cell ignited-cells)
         :spread-rate-matrix (m/to-nested-vectors spread-rate-matrix)
         :fire-type-matrix (m/to-nested-vectors fire-type-matrix)
         :fire-line-intensity-matrix (m/to-nested-vectors fire-line-intensity-matrix)
         :fire-spread-matrix (m/to-nested-vectors fire-spread-matrix)
         :flame-length-matrix (m/to-nested-vectors flame-length-matrix)
+        :heat-density-matrix (m/to-nested-vectors heat-density-matrix)
         :burn-time-matrix (m/to-nested-vectors burn-time-matrix)
     })
 
