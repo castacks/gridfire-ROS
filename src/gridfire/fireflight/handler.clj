@@ -97,7 +97,7 @@
 (defroutes app-routes
     (GET "/simulate" request (handle-simulation-request request))
     (POST "/simulate" request (handle-simulation-request request))
-    (GET "/elevation" request (handle-elevation-request request))
+    (GET "/rasters" request (handle-elevation-request request))
     (route/not-found "Not Found"))
 
 (def app
