@@ -57,7 +57,9 @@
         :burn-time-matrix (m/to-nested-vectors burn-time-matrix)
     })
 
-(defn format-response
+(def config-file "resources/sample_geotiff_config.edn")
+
+(defn format-simulation-response
     [output]
     (->> (output :summary-stats)
         (map matrix-to-vectors)
@@ -67,15 +69,35 @@
     [request]
     (if-let [runtime (get-in request [:body :runtime])]
         (try
-         (assoc (format-response (cli/propagate-until (if (int? runtime) runtime (Long/valueOf runtime)) "resources/sample_geotiff_config.edn"))
+         (assoc (format-simulation-response (cli/propagate-until (if (int? runtime) runtime (Long/valueOf runtime)) config-file))
                     :success "true")
          (catch Exception e
             (response {:msg (ex-message e) :success "false"})))
         (response {:msg "did not supply field 'runtime'" :success "false"})))
 
+(defn format-input-response
+    [{:keys [
+        landfire-rasters
+    ] :as inputs}]
+    {
+        :aspect (m/to-nested-vectors (:aspect landfire-rasters))
+        :canopy-base-height (m/to-nested-vectors (:canopy-base-height landfire-rasters))
+        :canopy-cover (m/to-nested-vectors (:canopy-cover landfire-rasters))
+        :canopy-height (m/to-nested-vectors (:canopy-height landfire-rasters))
+        :crown-bulk-density (m/to-nested-vectors (:crown-bulk-density landfire-rasters))
+        :elevation (m/to-nested-vectors (:elevation landfire-rasters))
+        :fuel-model (m/to-nested-vectors (:fuel-model landfire-rasters))
+        :slope (m/to-nested-vectors (:slope landfire-rasters))
+    })
+
+(defn handle-elevation-request
+    [request]
+    (response (format-input-response (cli/get-inputs config-file))))
+
 (defroutes app-routes
     (GET "/simulate" request (handle-simulation-request request))
     (POST "/simulate" request (handle-simulation-request request))
+    (GET "/elevation" request (handle-elevation-request request))
     (route/not-found "Not Found"))
 
 (def app

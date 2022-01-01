@@ -558,3 +558,8 @@
       (write-csv-outputs! new_inputs outputs)
       outputs)
     (log-str "Invalid config file. Config:" config-file)))
+
+(defn get-inputs [config-file]
+  (if-let [inputs (load-config config-file)]
+    inputs
+    (log-str "Invalid config file. Config:" config-file)))
