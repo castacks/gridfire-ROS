@@ -75,7 +75,7 @@
             (response {:msg (ex-message e) :success "false"})))
         (response {:msg "did not supply field 'runtime'" :success "false"})))
 
-(defn format-input-response
+(defn format-rasters-response
     [{:keys [
         landfire-rasters
     ] :as inputs}]
@@ -90,14 +90,14 @@
         :slope (m/to-nested-vectors (:slope landfire-rasters))
     })
 
-(defn handle-elevation-request
+(defn handle-rasters-request
     [request]
-    (response (format-input-response (cli/get-inputs config-file))))
+    (response (format-rasters-response (cli/get-inputs config-file))))
 
 (defroutes app-routes
     (GET "/simulate" request (handle-simulation-request request))
     (POST "/simulate" request (handle-simulation-request request))
-    (GET "/rasters" request (handle-elevation-request request))
+    (GET "/rasters" request (handle-rasters-request request))
     (route/not-found "Not Found"))
 
 (def app
