@@ -11,7 +11,7 @@
     <url>https://github.com/castacks/gridfire-ROS</url>
     <connection>scm:git:git://github.com/castacks/gridfire-ROS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/castacks/gridfire-ROS.git</developerConnection>
-    <tag>64f2aa980af563afe346a2fb01906b5ad9c815fc</tag>
+    <tag>373095480a62b72440de6310eb22165bf68e9079</tag>
   </scm>
   <build>
     <sourceDirectory>.lein-git-deps/triangulum/src</sourceDirectory>
@@ -169,9 +169,24 @@
       <version>0.5.4</version>
     </dependency>
     <dependency>
+      <groupId>ring-cors</groupId>
+      <artifactId>ring-cors</artifactId>
+      <version>0.1.13</version>
+    </dependency>
+    <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-json</artifactId>
+      <version>0.5.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>data.json</artifactId>
       <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-core</artifactId>
+      <version>1.9.4</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -194,9 +209,26 @@
       <version>1.6.2</version>
     </dependency>
     <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-defaults</artifactId>
+      <version>0.3.2</version>
+    </dependency>
+    <dependency>
       <groupId>com.nextjournal</groupId>
       <artifactId>beholder</artifactId>
       <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ring</groupId>
+      <artifactId>ring-mock</artifactId>
+      <version>0.3.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
