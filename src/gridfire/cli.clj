@@ -303,6 +303,18 @@
            :weather-layers       (fetch/weather-layers config)
            :fuel-moisture-layers (fetch/fuel-moisture-layers config))))
 
+;;newly added
+(defn add-input-layers-parallel
+  [config]
+  (let [{landfire-layers :landfire-layers 
+      other-layers :other-layers}
+    (fetch/all-layers-parallel config)]
+    (merge (assoc config
+      :envelope (get-envelope config landfire-layers)
+      :landfire-rasters (into {} 
+          (map (fn [[layer-name layer-info]] [layer-name (first (:matrix layer-info))]) landfire-layers)))
+      other-layers)))
+
 (defn add-misc-params
   [{:keys [random-seed landfire-rasters] :as inputs}]
   (assoc inputs
@@ -357,7 +369,7 @@
 (defn load-inputs
   [config]
   (-> config
-      (add-input-layers)
+      (add-input-layers-parallel)
       (add-misc-params)
       (add-sampled-params)
       (add-weather-params)

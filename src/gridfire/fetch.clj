@@ -1,6 +1,7 @@
 ;; [[file:../../org/GridFire.org::fetch.clj][fetch.clj]]
 (ns gridfire.fetch
   (:require [clojure.core.matrix      :as m]
+            [clojure.core.reducers    :as r]
             [gridfire.conversion      :as convert]
             [gridfire.magellan-bridge :refer [geotiff-raster-to-matrix]]
             [gridfire.postgis-bridge  :refer [postgis-raster-to-matrix]]))
@@ -21,6 +22,12 @@
    :elevation
    :fuel-model
    :slope])
+
+(def other-layers-names
+  [:ignition-layer
+   :ignition-mask-layer
+   :weather-layers
+   :fuel-moisture-layers])
 
 (defmulti landfire-layer
   (fn [_ {:keys [type]}] type))
@@ -52,8 +59,30 @@
                     (-> (landfire-layer db-spec source)
                         (convert/to-imperial source layer-name))
                     (-> (postgis-raster-to-matrix db-spec source)
-                        (convert/to-imperial {:units :metric} layer-name)))])))
-        layer-names))
+                        (convert/to-imperial {:units :metric} layer-name)))]))) 
+          layer-names))
+
+(defn landfire-layers-parallel
+  "Returns a map of LANDFIRE layers (represented as maps) with the following units:
+   {:elevation          feet
+    :slope              vertical feet/horizontal feet
+    :aspect             degrees clockwise from north
+    :fuel-model         fuel model numbers 1-256
+    :canopy-height      feet
+    :canopy-base-height feet
+    :crown-bulk-density lb/ft^3
+    :canopy-cover       % (0-100)}"
+  [{:keys [db-spec] :as config}]
+  (into {}
+        (pmap (fn [layer-name]
+               (let [source (get-in config [:landfire-layers layer-name])]
+                 [layer-name
+                  (if (map? source)
+                    (-> (landfire-layer db-spec source)
+                        (convert/to-imperial source layer-name))
+                    (-> (postgis-raster-to-matrix db-spec source)
+                        (convert/to-imperial {:units :metric} layer-name)))])) 
+                        (vec layer-names))))
 
 ;;-----------------------------------------------------------------------------
 ;; Initial Ignition
@@ -117,8 +146,23 @@
                (let [weather-spec (get config weather-name)]
                  (when (map? weather-spec)
                    [weather-name (-> (weather config weather-spec)
-                                     (convert/to-imperial weather-spec weather-name))]))))
-        weather-names))
+                                     (convert/to-imperial weather-spec weather-name))])))
+                                     weather-names)))
+
+(defn weather-layers-parallel
+  "Returns a map of weather layers (represented as maps) with the following units:
+   {:temperature         farenheight
+    :relative-humidity   %
+    :wind-speed-20ft     mph
+    :wind-from-direction degrees clockwise from north}"
+  [config]
+  (into {}
+        (pmap (fn [weather-name]
+               (let [weather-spec (get config weather-name)]
+                 (when (map? weather-spec)
+                   [weather-name (-> (weather config weather-spec)
+                                     (convert/to-imperial weather-spec weather-name))])))
+                                     weather-names)))
 
 ;;-----------------------------------------------------------------------------
 ;; Ignition Mask
@@ -172,3 +216,33 @@
           (update-in [:live :herbaceous] (comp #(update % :matrix first) f))
           (update-in [:live :woody] (comp #(update % :matrix first) f))))))
 ;; fetch.clj ends here
+
+(defn other-layers-parallel
+  [config]
+  (into {}
+    (pmap 
+      (fn [layer]
+        [layer
+          (cond 
+            (= layer :ignition-layer) (ignition-layer config)
+            (= layer :ignition-mask-layer) (ignition-mask-layer config)
+            (= layer :weather-layers) (weather-layers-parallel config)
+            (= layer :fuel-moisture-layers) (fuel-moisture-layers config)
+            :else nil)])
+      other-layers-names)))
+
+(def meta-layers
+  [:landfire-layers
+   :other-layers])
+
+(defn all-layers-parallel
+  [config]
+  (into {}
+    (pmap
+      (fn [layer]
+        [layer 
+          (cond
+            (= layer :landfire-layers) (landfire-layers-parallel config)
+            (= layer :other-layers) (other-layers-parallel config)
+            :else nil)]) 
+            meta-layers)))

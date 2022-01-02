@@ -78,8 +78,10 @@
 (defn format-rasters-response
     [{:keys [
         landfire-rasters
+        cell-size
     ] :as inputs}]
     {
+        :cell-size cell-size
         :aspect (m/to-nested-vectors (:aspect landfire-rasters))
         :canopy-base-height (m/to-nested-vectors (:canopy-base-height landfire-rasters))
         :canopy-cover (m/to-nested-vectors (:canopy-cover landfire-rasters))
