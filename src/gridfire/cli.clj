@@ -539,11 +539,12 @@
 (defn memo [f]
   (let [mem (atom {})]
     (fn [& args]
-      (if-let [e (find @mem args)]
-        (val e)
-        (let [ret (apply f args)]
-          (swap! mem assoc args ret)
-          ret)))))
+      (locking mem
+        (if-let [e (find @mem args)]
+          (val e)
+          (let [ret (apply f args)]
+            (swap! mem assoc args ret)
+            ret))))))
 
 (defn load-config 
   [config-file]
