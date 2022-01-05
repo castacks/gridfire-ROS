@@ -315,11 +315,17 @@
           (map (fn [[layer-name layer-info]] [layer-name (first (:matrix layer-info))]) landfire-layers)))
       other-layers)))
 
+(defn get-min-row-count [landfire-rasters]
+  (apply min (map m/row-count (vals landfire-rasters))))
+
+(defn get-min-col-count [landfire-rasters]
+  (apply min (map m/column-count (vals landfire-rasters))))
+
 (defn add-misc-params
   [{:keys [random-seed landfire-rasters] :as inputs}]
   (assoc inputs
-         :num-rows          (m/row-count (:fuel-model landfire-rasters))
-         :num-cols          (m/column-count (:fuel-model landfire-rasters))
+         :num-rows          (get-min-row-count landfire-rasters)
+         :num-cols          (get-min-col-count landfire-rasters)
          :multiplier-lookup (create-multiplier-lookup inputs)
          :rand-gen          (if random-seed
                               (Random. random-seed)

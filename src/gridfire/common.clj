@@ -6,7 +6,8 @@
 (defn matrix-value-at ^double
   [[i j] ^double global-clock matrix]
   (if (> (m/dimensionality matrix) 2)
-    (let [band (int (quot global-clock 60.0))] ;Assuming each band is 1 hour
+    (let [band (int (quot global-clock 160000.0))] ;Assuming each band is 1 hour
+      (if (or (> i (nth (m/shape matrix) 1)) (> j (nth (m/shape matrix) 2))) (prn i j) nil)
       (m/mget matrix band i j))
     (m/mget matrix i j)))
 

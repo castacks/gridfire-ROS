@@ -57,7 +57,7 @@
         :burn-time-matrix (m/to-nested-vectors burn-time-matrix)
     })
 
-(def config-file "resources/sample_geotiff_config.edn")
+(def config-file "fireflight/config1/fireflight_geotiff_config.edn")
 
 (defn format-simulation-response
     [output]
@@ -68,11 +68,11 @@
 (defn handle-simulation-request
     [request]
     (if-let [runtime (get-in request [:body :runtime])]
-        (try
+        ;; (try
          (assoc (format-simulation-response (cli/propagate-until (if (int? runtime) runtime (Long/valueOf runtime)) config-file))
                     :success "true")
-         (catch Exception e
-            (response {:msg (ex-message e) :success "false"})))
+        ;;  (catch Exception e
+        ;;     (response {:msg (ex-message e) :success "false"})))
         (response {:msg "did not supply field 'runtime'" :success "false"})))
 
 (defn format-rasters-response
