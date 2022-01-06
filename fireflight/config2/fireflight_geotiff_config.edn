@@ -1,29 +1,29 @@
 ;; [[file:../org/GridFire.org::sample_geotiff_config.edn][sample_geotiff_config.edn]]
 {;; Section 1: Landscape data to be shared by all simulations
     :landfire-layers           {:aspect             {:type   :geotiff
-                                                     :source "fireflight/config1/resources/asp.tif"}
+                                                     :source "fireflight/config2/resources/asp.tif"}
                                                      :canopy-base-height {:type   :geotiff
-                                                     :source "fireflight/config1/resources/cbh.tif"}
+                                                     :source "fireflight/config2/resources/cbh.tif"}
                                                      :canopy-cover       {:type   :geotiff
-                                                     :source "fireflight/config1/resources/cc.tif"}
+                                                     :source "fireflight/config2/resources/cc.tif"}
                                                      :canopy-height      {:type   :geotiff
-                                                     :source "fireflight/config1/resources/ch.tif"}
+                                                     :source "fireflight/config2/resources/ch.tif"}
                                                      :crown-bulk-density {:type   :geotiff
-                                                     :source "fireflight/config1/resources/cbd.tif"}
+                                                     :source "fireflight/config2/resources/cbd.tif"}
                                                      :elevation          {:type   :geotiff
-                                                     :source "fireflight/config1/resources/dem.tif"}
+                                                     :source "fireflight/config2/resources/dem.tif"}
                                                      :fuel-model         {:type   :geotiff
-                                                     :source "fireflight/config1/resources/fbfm40.tif"}
+                                                     :source "fireflight/config2/resources/fbfm40.tif"}
                                                      :slope              {:type   :geotiff
-                                                     :source "fireflight/config1/resources/slp.tif"}}
+                                                     :source "fireflight/config2/resources/slp.tif"}}
     :srid                      "CUSTOM:900914"
-    :cell-size                 32.8084         ; (feet)
+    :cell-size                 16.404         ; (feet)
 
     ;; Section 2: Ignition data from which to build simulation inputs
 ;;     :ignition-layer            {:type   :geotiff
 ;;                                 :source "test/gridfire/resources/ign.tif"}
-    :ignition-row              300
-    :ignition-col              300
+    :ignition-row              200
+    :ignition-col              200
     ;; Section 3: Weather data from which to build simulation inputs
     ;; For all options in this section, you may enter values in one of five ways:
     ;;   1. Single Value: 25
@@ -68,6 +68,6 @@
     :output-geotiffs?          true
     :output-pngs?              true
     :output-csvs?              true
-    :output-directory          "fireflight/config1/output"
+    :output-directory          "fireflight/config2/output"
 }
 ;; sample_geotiff_config.edn ends here

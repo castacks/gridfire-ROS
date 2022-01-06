@@ -265,7 +265,7 @@
 
 (defn cell-size-multiplier
   [cell-size {:keys [scalex]}]
-  (int (quot (m->ft scalex) cell-size)))  ; FIXME: Should we be using /?
+  (if scalex (int (quot (m->ft scalex) cell-size))) 10) ; FIXME: Should we be using /?
 
 ;; FIXME: This would be simpler is we flattened fuel-moisture-layers into a single-level map
 (defn create-multiplier-lookup

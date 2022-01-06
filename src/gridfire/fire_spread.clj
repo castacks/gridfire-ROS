@@ -433,6 +433,7 @@
              inputs            (perturbation/update-global-vals inputs global-clock next-global-clock)]
          ;; [{:cell :trajectory :fractional-distance
          ;;   :flame-length :fire-line-intensity} ...]
+        ;;  (if (= global-clock 0.0) (prn (map :cell ignition-events) (map :cell ignited-cells)) nil)
          (doseq [{:keys
                   [cell flame-length fire-line-intensity
                    ignition-probability spread-rate fire-type
@@ -467,6 +468,7 @@
                                         fire-spread-matrix
                                         global-clock)
                   spot-ignite-later)))
+        (do (prn (if (seq ignited-cells) :max-runtime-reached :no-burnable-fuels))
        {:global-clock               global-clock
         :exit-condition             (if (seq ignited-cells) :max-runtime-reached :no-burnable-fuels)
         :fire-spread-matrix         fire-spread-matrix
@@ -479,6 +481,7 @@
         :heat-density-matrix        heat-density-matrix
         :crown-fire-count           @crown-fire-count
         :spot-count                 @spot-count}))))
+        )
 
 (defn- initialize-matrix
   [num-rows num-cols indices]
@@ -543,6 +546,7 @@
         fire-type-matrix           (m/zero-matrix num-rows num-cols)
         heat-density-matrix        (m/zero-matrix num-rows num-cols)
         fractional-distance-matrix (when (= trajectory-combination :sum) (m/zero-matrix num-rows num-cols))]
+    (prn initial-ignition-site)
     (when (and (in-bounds? num-rows num-cols initial-ignition-site)
                (burnable-fuel-model? (m/mget fuel-model-matrix i j))
                (burnable-neighbors? fire-spread-matrix fuel-model-matrix
