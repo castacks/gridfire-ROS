@@ -57,7 +57,7 @@
         :burn-time-matrix (m/to-nested-vectors burn-time-matrix)
     })
 
-(def config-file "fireflight/config1/fireflight_geotiff_config.edn")
+(def config-file "fireflight/config2/fireflight_geotiff_config.edn")
 
 (defn format-simulation-response
     [output]
