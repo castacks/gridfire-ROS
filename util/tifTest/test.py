@@ -1,0 +1,146 @@
+import numpy as np
+from osgeo import gdal, osr
+import sys, getopt, os
+
+print(sys.path)
+
+
+from PIL import Image
+
+
+def analyze_file(file):
+    ds = gdal.Open(file)
+    arr = np.array(ds.GetRasterBand(1).ReadAsArray())
+    print("Number of bands:", ds.RasterCount)
+    out_str = np.array2string(arr, threshold=10000000000)
+    out_str = out_str.replace("\n", '')
+    out_str = out_str.replace("] [", "\n")
+    out_str = out_str.replace("[[", "")
+    out_str = out_str.replace("]]", "")
+    with open("analyzed2.txt", "w") as out_file:
+        print(out_str, file=out_file)
+        out_file.close()
+    max_val = np.max(arr[np.nonzero(arr)])
+    min_val = np.min(arr[np.nonzero(arr)])
+    print("array size:", arr.shape)
+    print(max_val)
+    print(min_val)
+    normalized = arr
+    if (max_val - min_val > 0):
+        normalized[np.nonzero(arr)] = (arr[np.nonzero(arr)] - min_val)/(max_val - min_val)*255
+    else:
+        normalized[np.nonzero(arr)] = 255
+    # print(np.array2string(normalized, threshold=np.inf))
+    im = Image.fromarray(normalized)
+    if (im.mode != "RGB"):
+        im = im.convert("RGB")
+    im.save("analyzed2.jpeg")
+
+def crop_array(arr, newsize, start):
+    ret = np.zeros(newsize)
+    ret = arr[start[0]:(start[0]+newsize[0]), start[1]:(start[1]+newsize[1])]
+    return ret
+
+
+def crop(file, newsize):
+    ds = gdal.Open(file)
+    band = ds.GetRasterBand(1)
+    arr = np.array(band.ReadAsArray())
+    width  = ds.RasterXSize
+    height = ds.RasterYSize
+    gt = ds.GetGeoTransform()
+    # minx = gt[0]
+    # miny = gt[3] + width*gt[4] + height*gt[5]
+    # maxx = gt[0] + width*gt[1] + height*gt[2]
+    # maxy = gt[3]
+
+    mid_pix_x = width//2
+    mid_pix_y = height//2
+    min_pix_x = mid_pix_x - newsize[1]//2
+    min_pix_y = mid_pix_y - newsize[0]//2
+    new_arr = crop_array(arr, newsize, (min_pix_y, min_pix_x))
+
+    # print(minx, miny, maxx, maxy)
+
+    # new_arr = crop_array(arr, newsize)
+    new_minx = gt[0] + min_pix_x * gt[1] + min_pix_y * gt[2]
+    new_maxy = gt[3] + min_pix_x * gt[4] + min_pix_y * gt[5]
+    
+    new_gt = (new_minx, gt[1], gt[2], new_maxy, gt[4], gt[5])
+
+    output_raster = gdal.GetDriverByName('GTiff').Create('cropped.tif', newsize[1], newsize[0], 1, band.DataType)
+    output_raster.SetGeoTransform(new_gt)
+    old_cs = osr.SpatialReference()
+    old_cs.ImportFromWkt(ds.GetProjectionRef())
+    output_raster.SetProjection(old_cs.ExportToWkt())
+    output_raster.GetRasterBand(1).WriteArray(new_arr)
+    output_raster.FlushCache()
+
+def scale_up_array(arr, factor):
+    old_shape = np.shape(arr)
+    new_arr = np.zeros((old_shape[0] * factor, old_shape[1] * factor))
+    for i in range(old_shape[0]):
+        for j in range(old_shape[1]):
+            for k in range(factor):
+                for l in range(factor):
+                    new_arr[i * factor + k, j * factor + l] = arr[i, j]
+    return new_arr
+
+def scale_up(file, factor):
+    ds = gdal.Open(file)
+    band = ds.GetRasterBand(1)
+    arr = np.array(band.ReadAsArray())
+    width = ds.RasterXSize
+    height = ds.RasterYSize
+    new_arr = scale_up_array(arr, factor)
+    gt = ds.GetGeoTransform()
+    minx = gt[0]
+    miny = gt[3] + width*gt[4] + height*gt[5]
+    maxx = gt[0] + width*gt[1] + height*gt[2]
+    maxy = gt[3]
+
+    new_width = width * factor
+    new_height = height * factor
+    xres = (maxx - minx)/float(new_width)
+    yres = (maxy - miny)/float(new_height)
+    new_gt = (minx, xres, 0, maxy, 0, -yres)
+
+    output_raster = gdal.GetDriverByName('GTiff').Create('scaled.tif', width * factor, height * factor, 1, band.DataType)
+    output_raster.SetGeoTransform(new_gt)
+    old_cs = osr.SpatialReference()
+    old_cs.ImportFromWkt(ds.GetProjectionRef())
+    output_raster.SetProjection(old_cs.ExportToWkt())
+    output_raster.GetRasterBand(1).WriteArray(new_arr)
+    output_raster.FlushCache()
+
+
+def process_one(file):
+    scale_up(file, 6)
+    crop("scaled.tif", (512, 512))
+
+def process_all():
+    for filename in os.listdir('input'):
+        if filename.endswith('.tif'):
+            full_name = os.path.join('input', filename)
+            process_one(full_name)
+            os.remove("scaled.tif")
+            os.rename("cropped.tif", os.path.join('output', filename))
+
+def main(argv):
+    file = ''
+    try:
+        opts, args = getopt.getopt(argv, "f:", ["file="])
+    except getopt.GetoptError:
+        print ('test.py -f <filename>')
+    for opt, arg in opts:
+        if opt in ("-f", "--file"):
+            file  = arg
+    if (file != ''):
+        analyze_file(file)
+        # process_one(file)
+        # analyze_file("cropped.tif")
+    else:
+        process_all()
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
