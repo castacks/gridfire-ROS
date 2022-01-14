@@ -37,9 +37,9 @@
     ;; For a range of values, the range [inclusive exclusive] will be randomly sampled from in each simulation.
 
     :temperature                      {:type   :geotiff
-    :source "test/gridfire/resources/weather-test/tmpf_to_sample.tif"}  ; (degrees Fahrenheit)
+    :source "fireflight/config_cali2/resources/weather/tmp.tif"}  ; (degrees Fahrenheit)
     :relative-humidity                {:type   :geotiff
-    :source "test/gridfire/resources/weather-test/rh_to_sample.tif"}    ; (%)
+    :source "fireflight/config_cali2/resources/weather/rh.tif"}    ; (%)
     :wind-speed-20ft                  {:type   :geotiff
     :source "fireflight/config_cali2/resources/weather/vel.tif"}    ; (miles/hour)
     :wind-from-direction              {:type   :geotiff
