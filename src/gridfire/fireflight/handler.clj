@@ -90,8 +90,8 @@
         :crown-bulk-density (m/to-nested-vectors (:crown-bulk-density landfire-rasters))
         :elevation (m/to-nested-vectors (:elevation landfire-rasters))
         :fuel-model (m/to-nested-vectors (:fuel-model landfire-rasters))
-        :wind-speeds (m/to-nested-vectors (:wind-speed-20ft weather-layers)) 
-        :wind-directions (m/to-nested-vectors (:wind-from-direction weather-layers))
+        :wind-speeds (m/to-nested-vectors (m/slice (:matrix (:wind-speed-20ft weather-layers)) 0))
+        :wind-directions (m/to-nested-vectors (m/slice (:matrix (:wind-from-direction weather-layers)) 0))
         :slope (m/to-nested-vectors (:slope landfire-rasters))
     })
 
