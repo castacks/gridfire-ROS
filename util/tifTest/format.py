@@ -113,6 +113,22 @@ def scale_up(file, factor):
     output_raster.GetRasterBand(1).WriteArray(new_arr)
     output_raster.FlushCache()
 
+def fill_with(file, val):
+    ds = gdal.Open(file)
+    band = ds.GetRasterBand(1)
+    arr = np.array(band.ReadAsArray())
+    width = ds.RasterXSize
+    height = ds.RasterYSize
+    new_arr = np.zeros(np.shape(arr))
+    new_arr.fill(val)
+    output_raster = gdal.GetDriverByName('GTiff').Create('filled.tif', width, height, 1, band.DataType)
+    output_raster.SetGeoTransform(ds.GetGeoTransform())
+    old_cs = osr.SpatialReference()
+    old_cs.ImportFromWkt(ds.GetProjectionRef())
+    output_raster.SetProjection(old_cs.ExportToWkt())
+    output_raster.GetRasterBand(1).WriteArray(new_arr)
+    output_raster.FlushCache()
+
 
 def process_one(file):
     scale_up(file, 6)
@@ -136,6 +152,7 @@ def main(argv):
         if opt in ("-f", "--file"):
             file  = arg
     if (file != ''):
+        # fill_with(file, 28.8)
         analyze_file(file)
         # process_one(file)
         # analyze_file("cropped.tif")
