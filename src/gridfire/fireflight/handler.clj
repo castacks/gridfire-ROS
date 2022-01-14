@@ -78,6 +78,7 @@
 (defn format-rasters-response
     [{:keys [
         landfire-rasters
+        weather-layers
         cell-size
     ] :as inputs}]
     {
@@ -89,6 +90,8 @@
         :crown-bulk-density (m/to-nested-vectors (:crown-bulk-density landfire-rasters))
         :elevation (m/to-nested-vectors (:elevation landfire-rasters))
         :fuel-model (m/to-nested-vectors (:fuel-model landfire-rasters))
+        :wind-speeds (m/to-nested-vectors (:wind-speed-20ft weather-layers)) 
+        :wind-directions (m/to-nested-vectors (:wind-from-direction weather-layers))
         :slope (m/to-nested-vectors (:slope landfire-rasters))
     })
 
