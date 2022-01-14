@@ -131,7 +131,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "f:", ["file="])
     except getopt.GetoptError:
-        print ('test.py -f <filename>')
+        print ('format.py -f <filename>')
     for opt, arg in opts:
         if opt in ("-f", "--file"):
             file  = arg
