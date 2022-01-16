@@ -79,11 +79,43 @@ def crop(file, newsize):
 def scale_up_array(arr, factor):
     old_shape = np.shape(arr)
     new_arr = np.zeros((old_shape[0] * factor, old_shape[1] * factor))
+    new_shape = np.shape(new_arr)
+
     for i in range(old_shape[0]):
         for j in range(old_shape[1]):
-            for k in range(factor):
-                for l in range(factor):
-                    new_arr[i * factor + k, j * factor + l] = arr[i, j]
+            new_arr[factor//2 + factor * i, factor//2 + factor * j] = arr[i, j]
+
+    for i in range(old_shape[0]):
+        for j in range(new_shape[1]):
+            if (j < factor//2):
+                new_arr[factor//2 + factor * i, j] = arr[i, 0]
+            elif (j > factor//2 + factor * (old_shape[1]-1)):
+                new_arr[factor//2 + factor * i, j] = arr[i, old_shape[1]-1]
+            elif ((j - factor//2) % factor != 0):
+                last = (j - factor//2)//factor
+                next = last + 1
+                diff = arr[i, next] - arr[i, last]
+                interp = (j - factor//2)%factor
+                new_arr[factor//2 + factor * i, j] = arr[i, last] + diff/factor*interp
+    
+    for j in range(new_shape[1]):
+        for i in range(new_shape[0]):
+            if (i < factor//2):
+                new_arr[i, j] = new_arr[factor//2, j]
+            elif (i > factor//2 + factor * (old_shape[0]-1)):
+                new_arr[i, j] = new_arr[factor//2 + factor * (old_shape[0]-1), j]
+            elif((i - factor//2) % factor != 0):
+                last = (i - factor//2)//factor
+                next = last + 1
+                diff = new_arr[factor//2 + next * factor, j] - new_arr[factor//2 + last * factor, j]
+                interp = (i - factor//2)%factor
+                new_arr[i, j] = new_arr[factor//2 + last * factor, j] + diff/factor*interp
+
+    # for i in range(old_shape[0]):
+    #     for j in range(old_shape[1]):
+    #         for k in range(factor):
+    #             for l in range(factor):
+    #                 new_arr[i * factor + k, j * factor + l] = arr[i, j]
     return new_arr
 
 def scale_up(file, factor):
@@ -152,8 +184,10 @@ def main(argv):
         if opt in ("-f", "--file"):
             file  = arg
     if (file != ''):
+        # process_one(file)
         # fill_with(file, 28.8)
         analyze_file(file)
+        # analyze_file("cropped.tif")
         # process_one(file)
         # analyze_file("cropped.tif")
     else:
