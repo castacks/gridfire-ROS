@@ -2,9 +2,6 @@ import numpy as np
 from osgeo import gdal, osr
 import sys, getopt, os
 
-print(sys.path)
-
-
 from PIL import Image
 
 
@@ -17,7 +14,7 @@ def analyze_file(file):
     out_str = out_str.replace("] [", "\n")
     out_str = out_str.replace("[[", "")
     out_str = out_str.replace("]]", "")
-    with open("analyzed2.txt", "w") as out_file:
+    with open("analyzed.txt", "w") as out_file:
         print(out_str, file=out_file)
         out_file.close()
     max_val = np.max(arr[np.nonzero(arr)])
@@ -34,7 +31,7 @@ def analyze_file(file):
     im = Image.fromarray(normalized)
     if (im.mode != "RGB"):
         im = im.convert("RGB")
-    im.save("analyzed2.jpeg")
+    im.save("analyzed.jpeg")
 
 def crop_array(arr, newsize, start):
     ret = np.zeros(newsize)
@@ -76,7 +73,7 @@ def crop(file, newsize):
     output_raster.GetRasterBand(1).WriteArray(new_arr)
     output_raster.FlushCache()
 
-def scale_up_array(arr, factor):
+def scale_up_array_interp(arr, factor):
     old_shape = np.shape(arr)
     new_arr = np.zeros((old_shape[0] * factor, old_shape[1] * factor))
     new_shape = np.shape(new_arr)
@@ -110,21 +107,27 @@ def scale_up_array(arr, factor):
                 diff = new_arr[factor//2 + next * factor, j] - new_arr[factor//2 + last * factor, j]
                 interp = (i - factor//2)%factor
                 new_arr[i, j] = new_arr[factor//2 + last * factor, j] + diff/factor*interp
-
-    # for i in range(old_shape[0]):
-    #     for j in range(old_shape[1]):
-    #         for k in range(factor):
-    #             for l in range(factor):
-    #                 new_arr[i * factor + k, j * factor + l] = arr[i, j]
     return new_arr
 
-def scale_up(file, factor):
+def scale_up_array(arr, factor):
+    old_shape = np.shape(arr)
+    new_arr = np.zeros((old_shape[0] * factor, old_shape[1] * factor))
+    for i in range(old_shape[0]):
+        for j in range(old_shape[1]):
+            for k in range(factor):
+                for l in range(factor):
+                    new_arr[i * factor + k, j * factor + l] = arr[i, j]
+    return new_arr
+
+
+def scale_up(file, factor, interp):
     ds = gdal.Open(file)
     band = ds.GetRasterBand(1)
     arr = np.array(band.ReadAsArray())
     width = ds.RasterXSize
     height = ds.RasterYSize
-    new_arr = scale_up_array(arr, factor)
+    if (interp): new_arr = scale_up_array_interp(arr, factor)
+    else: new_arr = scale_up_array(arr, factor)
     gt = ds.GetGeoTransform()
     minx = gt[0]
     miny = gt[3] + width*gt[4] + height*gt[5]
@@ -161,35 +164,40 @@ def fill_with(file, val):
     output_raster.GetRasterBand(1).WriteArray(new_arr)
     output_raster.FlushCache()
 
-
-def process_one(file):
-    scale_up(file, 6)
+def process_one(file, interp):
+    scale_up(file, 6, interp)
     crop("scaled.tif", (512, 512))
 
 def process_all():
     for filename in os.listdir('input'):
         if filename.endswith('.tif'):
             full_name = os.path.join('input', filename)
-            process_one(full_name)
+            process_one(full_name, False)
             os.remove("scaled.tif")
             os.rename("cropped.tif", os.path.join('output', filename))
 
 def main(argv):
     file = ''
+    analyze = False
+    interp = False
     try:
-        opts, args = getopt.getopt(argv, "f:", ["file="])
+        opts, args = getopt.getopt(argv, "a:i:", ["analyze=", "interp="])
     except getopt.GetoptError:
-        print ('format.py -f <filename>')
+        print ('format.py -a <filename>')
     for opt, arg in opts:
-        if opt in ("-f", "--file"):
+        if opt in ("-a", "--analyze"):
             file  = arg
+            analyze = True
+        elif opt in ("-i", "--interp"):
+            file = arg
+            interp = True
     if (file != ''):
-        # process_one(file)
-        # fill_with(file, 28.8)
-        analyze_file(file)
-        # analyze_file("cropped.tif")
-        # process_one(file)
-        # analyze_file("cropped.tif")
+        if (analyze):
+            analyze_file(file)
+        elif(interp):
+            process_one(file, True)
+            os.remove("scaled.tif")
+            os.rename("cropped.tif", "process_interped.tif")
     else:
         process_all()
 
