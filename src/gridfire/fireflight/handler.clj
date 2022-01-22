@@ -80,9 +80,13 @@
         landfire-rasters
         weather-layers
         cell-size
+        ignition-row
+        ignition-col
     ] :as inputs}]
     {
         :cell-size cell-size
+        :ignition-row ignition-row
+        :ignition-col ignition-col
         :aspect (m/to-nested-vectors (:aspect landfire-rasters))
         :canopy-base-height (m/to-nested-vectors (:canopy-base-height landfire-rasters))
         :canopy-cover (m/to-nested-vectors (:canopy-cover landfire-rasters))
