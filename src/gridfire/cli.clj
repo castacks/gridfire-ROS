@@ -565,11 +565,12 @@
 (def load-config (memo load-config))
 
 (defn propagate-until
-  [max-runtime config-file]
+  [max-runtime config-file ignition-points]
   (if-let [inputs (load-config config-file)]
     (let [new_inputs 
             (assoc inputs 
               :max-runtime max-runtime
+              :initial-ignition-points ignition-points
               :max-runtimes (draw-samples (inputs :rand-gen) (inputs :simulations) max-runtime))
           outputs (run-simulations! new_inputs)]
       (write-landfire-layers! new_inputs)

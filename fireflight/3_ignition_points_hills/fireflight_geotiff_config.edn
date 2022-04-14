@@ -1,29 +1,28 @@
 ;; [[file:../org/GridFire.org::sample_geotiff_config.edn][sample_geotiff_config.edn]]
 {;; Section 1: Landscape data to be shared by all simulations
     :landfire-layers           {:aspect             {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/asp.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/asp.tif"}
                                                      :canopy-base-height {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/cbh.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/cbh.tif"}
                                                      :canopy-cover       {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/cc.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/cc.tif"}
                                                      :canopy-height      {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/ch.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/ch.tif"}
                                                      :crown-bulk-density {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/cbd.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/cbd.tif"}
                                                      :elevation          {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/dem.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/dem.tif"}
                                                      :fuel-model         {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/fbfm40.tif"}
+                                                     :source "fireflight/3_ignition_points_hills/resources/fbfm40.tif"}
                                                      :slope              {:type   :geotiff
-                                                     :source "fireflight/config_cali2/resources/slp.tif"}}
+                                                     :source "fireflight/3_ignition_points_hills/resources/slp.tif"}}
     :srid                      "CUSTOM:900914"
     :cell-size                 16.404         ; (feet)
 
     ;; Section 2: Ignition data from which to build simulation inputs
 ;;     :ignition-layer            {:type   :geotiff
 ;;                                 :source "test/gridfire/resources/ign.tif"}
-    :ignition-row              300
-    :ignition-col              300
+    :initial-ignition-points     [[300 231] [100 392] [450 111]]
     ;; Section 3: Weather data from which to build simulation inputs
     ;; For all options in this section, you may enter values in one of five ways:
     ;;   1. Single Value: 25
@@ -37,13 +36,13 @@
     ;; For a range of values, the range [inclusive exclusive] will be randomly sampled from in each simulation.
 
     :temperature                      {:type   :geotiff
-    :source "fireflight/config_cali2/resources/weather/tmp.tif"}  ; (degrees Fahrenheit)
+    :source "fireflight/3_ignition_points_hills/resources/weather/tmp.tif"}  ; (degrees Fahrenheit)
     :relative-humidity                {:type   :geotiff
-    :source "fireflight/config_cali2/resources/weather/rh.tif"}    ; (%)
+    :source "fireflight/3_ignition_points_hills/resources/weather/rh.tif"}    ; (%)
     :wind-speed-20ft                  {:type   :geotiff
-    :source "fireflight/config_cali2/resources/weather/vel.tif"}    ; (miles/hour)
+    :source "fireflight/3_ignition_points_hills/resources/weather/vel.tif"}    ; (miles/hour)
     :wind-from-direction              {:type   :geotiff
-    :source "fireflight/config_cali2/resources/weather/ang.tif"}    ; (degrees clockwise from north)
+    :source "fireflight/3_ignition_points_hills/resources/weather/ang.tif"}    ; (degrees clockwise from north)
     :foliar-moisture                  90
     :fuel-moisture-layers              {:dead {:1hr {:type     :geotiff
                                                      :source   "test/gridfire/resources/weather-test/m1_to_sample.tif"}
@@ -68,6 +67,6 @@
     :output-geotiffs?          true
     :output-pngs?              true
     :output-csvs?              true
-    :output-directory          "fireflight/config_cali2/output"
+    :output-directory          "fireflight/3_ignition_points_hills/output"
 }
 ;; sample_geotiff_config.edn ends here

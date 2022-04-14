@@ -67,13 +67,21 @@
 
 (defn handle-simulation-request
     [request]
-    (if-let [runtime (get-in request [:body :runtime])]
+    (if-let [[runtime config-name ignition-points] 
+            [(get-in request [:body :runtime]) 
+             (get-in request [:body :config])
+             (get-in request [:body :initial-ignition-points])]]
         ;; (try
-         (assoc (format-simulation-response (cli/propagate-until (if (int? runtime) runtime (Long/valueOf runtime)) config-file))
+         (assoc (format-simulation-response (cli/propagate-until (
+             if (int? runtime) 
+             runtime 
+             (Long/valueOf runtime)) 
+             (str "fireflight/" config-name "/fireflight_geotiff_config.edn")
+             ignition-points))
                     :success "true")
         ;;  (catch Exception e
         ;;     (response {:msg (ex-message e) :success "false"})))
-        (response {:msg "did not supply field 'runtime'" :success "false"})))
+        (response {:msg "did not supply field 'runtime' or 'config' or 'initial-ignition-points'" :success "false"})))
 
 (defn format-rasters-response
     [{:keys [
@@ -117,3 +125,5 @@
         (wrap-json-body {:keywords? true :bigdecimals? true})
         (wrap-json-response)
         (wrap-defaults api-defaults)))
+
+

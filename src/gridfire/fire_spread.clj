@@ -490,11 +490,22 @@
             :when (in-bounds? num-rows num-cols [i j])]
       (m/mset! matrix i j -1.0))
     matrix))
+  
+(defn- initialize-fire-spread-matrix
+  [num-rows num-cols indices]
+  (let [matrix (m/zero-matrix num-rows num-cols)]
+    (doseq [[i j] indices
+            :when (in-bounds? num-rows num-cols [i j])]
+      (m/mset! matrix i j 1.0))
+    matrix))
 
 (defn- get-non-zero-indices [m]
   (for [[r cols] (map-indexed vector (m/non-zero-indices m))
         c        cols]
     [r c]))
+
+(defn- get-zipped-indices [rows cols]
+  (map vector rows cols))
 
 (defmulti run-fire-spread
   "Runs the raster-based fire spread model with a map of these arguments:
@@ -520,11 +531,13 @@
      - nil (this causes GridFire to select a random ignition-point)
   - num-rows: integer
   - num-cols: integer"
-  (fn [{:keys [initial-ignition-site]}]
+  (fn [{:keys [initial-ignition-site initial-ignition-points]}]
+    (if (seq initial-ignition-points)
+    :multiple-ignition-points
     (condp = (type initial-ignition-site)
       clojure.lang.PersistentHashMap :ignition-perimeter
       clojure.lang.PersistentVector  :ignition-point
-      :random-ignition-point)))
+      :random-ignition-point))))
 
 (defmethod run-fire-spread :random-ignition-point
   [{:keys [ignitable-sites rand-gen] :as inputs}]
@@ -577,6 +590,39 @@
                    :heat-density-matrix        heat-density-matrix
                    :fractional-distance-matrix fractional-distance-matrix}
                   ignited-cells)))))
+
+(defmethod run-fire-spread :multiple-ignition-points
+  [{:keys [landfire-rasters num-rows num-cols initial-ignition-site initial-ignition-points spotting trajectory-combination] :as inputs}]
+  (let [non-zero-indices           initial-ignition-points
+        fire-spread-matrix         (initialize-fire-spread-matrix num-rows num-cols non-zero-indices)
+        perimeter-indices          (filter #(burnable-neighbors? fire-spread-matrix
+                                                                 (:fuel-model landfire-rasters)
+                                                                 num-rows
+                                                                 num-cols
+                                                                 %)
+                                           non-zero-indices)]
+    (when (seq perimeter-indices)
+      (let [flame-length-matrix        (initialize-matrix num-rows num-cols non-zero-indices)
+            fire-line-intensity-matrix (initialize-matrix num-rows num-cols non-zero-indices)
+            burn-time-matrix           (initialize-matrix num-rows num-cols non-zero-indices)
+            firebrand-count-matrix     (when spotting (m/zero-matrix num-rows num-cols))
+            spread-rate-matrix         (initialize-matrix num-rows num-cols non-zero-indices)
+            heat-density-matrix        (initialize-matrix num-rows num-cols non-zero-indices)
+            fire-type-matrix           (initialize-matrix num-rows num-cols non-zero-indices)
+            fractional-distance-matrix (when (= trajectory-combination :sum) (initialize-matrix num-rows num-cols non-zero-indices))
+            ignited-cells              (generate-ignited-cells inputs fire-spread-matrix perimeter-indices)]
+        (when (seq ignited-cells)
+          (run-loop inputs
+                    {:fire-spread-matrix         fire-spread-matrix
+                     :spread-rate-matrix         spread-rate-matrix
+                     :flame-length-matrix        flame-length-matrix
+                     :fire-line-intensity-matrix fire-line-intensity-matrix
+                     :firebrand-count-matrix     firebrand-count-matrix
+                     :burn-time-matrix           burn-time-matrix
+                     :fire-type-matrix           fire-type-matrix
+                     :heat-density-matrix        heat-density-matrix
+                     :fractional-distance-matrix fractional-distance-matrix}
+                    ignited-cells))))))
 
 (defmethod run-fire-spread :ignition-perimeter
   [{:keys [num-rows num-cols initial-ignition-site landfire-rasters spotting trajectory-combination] :as inputs}]
