@@ -113,9 +113,8 @@
         (response (format-rasters-response (cli/get-inputs (str "fireflight/" config-name "/fireflight_geotiff_config.edn"))))))
 
 (defroutes app-routes
-    (GET "/simulate" request (handle-simulation-request request))
     (POST "/simulate" request (handle-simulation-request request))
-    (GET "/rasters" request (handle-rasters-request request))
+    (POST "/rasters" request (handle-rasters-request request))
     (route/not-found "Not Found"))
 
 (def app
