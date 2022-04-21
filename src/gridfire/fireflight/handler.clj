@@ -109,7 +109,8 @@
 
 (defn handle-rasters-request
     [request]
-    (response (format-rasters-response (cli/get-inputs config-file))))
+    (if-let [config-name (get-in request [:body :config])]
+        (response (format-rasters-response (cli/get-inputs (str "fireflight/" config-file "/fireflight_geotiff_config.edn")))))
 
 (defroutes app-routes
     (GET "/simulate" request (handle-simulation-request request))
