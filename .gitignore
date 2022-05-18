@@ -18,4 +18,5 @@ scratch.clj
 bin/
 util/tifTest/input/*.tif
 util/tifTest/output/*.tif
-
+**/*.png
+pom.xml
