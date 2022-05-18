@@ -1,2 +1,0 @@
-simulation,ignition-row,ignition-col,max-runtime,temperature,relative-humidity,wind-speed-20ft,wind-from-direction,foliar-moisture,ellipse-adjustment-factor,fire-size,flame-length-mean,flame-length-stddev,fire-line-intensity-mean,fire-line-intensity-stddev,crown-fire-size,spot-count
-1,300,300,20000,"Large array with shape: [73,800,800]","Large array with shape: [73,800,800]","Large array with shape: [73,800,800]","Large array with shape: [73,800,800]",90,1.0,4198.765489534759,17.794393553071274,148.7478220382109,453109.52426919446,5083770.499093648,64.04971897547108,0
