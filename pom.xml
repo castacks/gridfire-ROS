@@ -11,10 +11,10 @@
     <url>https://github.com/castacks/gridfire-ROS</url>
     <connection>scm:git:git://github.com/castacks/gridfire-ROS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/castacks/gridfire-ROS.git</developerConnection>
-    <tag>373095480a62b72440de6310eb22165bf68e9079</tag>
+    <tag>23730e284456d87fb937873059c9e5b6aa5c54a0</tag>
   </scm>
   <build>
-    <sourceDirectory>.lein-git-deps/triangulum/src</sourceDirectory>
+    <sourceDirectory>.lein-git-deps\triangulum\src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
@@ -27,7 +27,7 @@
       </testResource>
     </testResources>
     <directory>target</directory>
-    <outputDirectory>target/classes</outputDirectory>
+    <outputDirectory>target\classes</outputDirectory>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -42,8 +42,8 @@
             </goals>
             <configuration>
               <sources>
-                <source>src/clj</source>
-                <source>src/cljc</source>
+                <source>src\clj</source>
+                <source>src\cljc</source>
                 <source>src</source>
               </sources>
             </configuration>
