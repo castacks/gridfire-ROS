@@ -1,21 +1,21 @@
 ;; [[file:../org/GridFire.org::sample_geotiff_config.edn][sample_geotiff_config.edn]]
 {;; Section 1: Landscape data to be shared by all simulations
     :landfire-layers           {:aspect             {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/asp.tif"}
+                                                     :source "fireflight/wv_forest/resources/asp.tif"}
                                                      :canopy-base-height {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/cbh.tif"}
+                                                     :source "fireflight/wv_forest/resources/cbh.tif"}
                                                      :canopy-cover       {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/cc.tif"}
+                                                     :source "fireflight/wv_forest/resources/cc.tif"}
                                                      :canopy-height      {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/ch.tif"}
+                                                     :source "fireflight/wv_forest/resources/ch.tif"}
                                                      :crown-bulk-density {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/cbd.tif"}
+                                                     :source "fireflight/wv_forest/resources/cbd.tif"}
                                                      :elevation          {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/dem.tif"}
+                                                     :source "fireflight/wv_forest/resources/dem.tif"}
                                                      :fuel-model         {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/fbfm40.tif"}
+                                                     :source "fireflight/wv_forest/resources/fbfm40.tif"}
                                                      :slope              {:type   :geotiff
-                                                     :source "fireflight/forestwv/resources/slp.tif"}}
+                                                     :source "fireflight/wv_forest/resources/slp.tif"}}
     :srid                      "CUSTOM:900914"
     :cell-size                 16.404         ; (feet)
 
@@ -36,13 +36,13 @@
     ;; For a range of values, the range [inclusive exclusive] will be randomly sampled from in each simulation.
 
     :temperature                      {:type   :geotiff
-    :source "fireflight/forestwv/resources/weather/tmp.tif"}  ; (degrees Fahrenheit)
+    :source "fireflight/wv_forest/resources/weather/tmp.tif"}  ; (degrees Fahrenheit)
     :relative-humidity                {:type   :geotiff
-    :source "fireflight/forestwv/resources/weather/rh.tif"}    ; (%)
+    :source "fireflight/wv_forest/resources/weather/rh.tif"}    ; (%)
     :wind-speed-20ft                  {:type   :geotiff
-    :source "fireflight/forestwv/resources/weather/vel.tif"}    ; (miles/hour)
+    :source "fireflight/wv_forest/resources/weather/vel.tif"}    ; (miles/hour)
     :wind-from-direction              {:type   :geotiff
-    :source "fireflight/forestwv/resources/weather/ang.tif"}    ; (degrees clockwise from north)
+    :source "fireflight/wv_forest/resources/weather/ang.tif"}    ; (degrees clockwise from north)
     :foliar-moisture                  90
     :fuel-moisture-layers              {:dead {:1hr {:type     :geotiff
                                                      :source   "test/gridfire/resources/weather-test/m1_to_sample.tif"}
@@ -67,7 +67,7 @@
     :output-geotiffs?          true
     :output-pngs?              true
     :output-csvs?              true
-    :output-directory          "fireflight/forestwv/output"
+    :output-directory          "fireflight/wv_forest/output"
 }
 ;; sample_geotiff_config.edn ends here
 
