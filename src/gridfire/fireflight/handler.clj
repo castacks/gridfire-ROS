@@ -21,7 +21,8 @@
             [ring.middleware.json         :refer [wrap-json-body wrap-json-response]]
             [ring.util.response           :refer [response]]
             [ring.middleware.cors         :refer [wrap-cors]])
-  (:import java.util.TimeZone))
+  (:import java.util.TimeZone)
+  (:import java.io.File))
 
 
 (defn matrix-to-vectors
@@ -112,9 +113,24 @@
     (if-let [config-name (get-in request [:body :config])]
         (response (format-rasters-response (cli/get-inputs (str "fireflight/" config-name "/fireflight_geotiff_config.edn"))))))
 
+(defn get-configs []
+    (map (fn [f] (.getName f)) (filter (fn [f] (.isDirectory f)) (.listFiles (File. "fireflight"))))
+)
+
+(defn format-configs-response
+    [configs]
+    {
+        :data configs
+    })
+
+(defn handle-configs-request
+    [request]
+    (response (format-configs-response (get-configs))))
+
 (defroutes app-routes
     (POST "/simulate" request (handle-simulation-request request))
     (POST "/rasters" request (handle-rasters-request request))
+    (GET "/configs" request (handle-configs-request request))
     (route/not-found "Not Found"))
 
 (def app
