@@ -1,7 +1,6 @@
 import numpy as np
 from osgeo import gdal, osr
 import sys, getopt, os
-
 from PIL import Image
 
 
